@@ -13,9 +13,9 @@ import java.util.List;
 
 public class WebScraper {
 
-    private String baseURLOffShore = "https://offshoreleaks.icij.org/";
-    private String baseURLWorlBank = "https://projects.worldbank.org/en/projects-operations/procurement/debarred-firms";
-    private String baseURLOFAC = "https://sanctionssearch.ofac.treas.gov";
+    private final String baseURLOffShore = "https://offshoreleaks.icij.org/";
+    private final String baseURLWorlBank = "https://projects.worldbank.org/en/projects-operations/procurement/debarred-firms";
+    private final String baseURLOFAC = "https://sanctionssearch.ofac.treas.gov";
 
     /**
      *
