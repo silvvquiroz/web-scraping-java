@@ -13,15 +13,13 @@ import java.util.List;
 
 public class WebScraper {
 
-    private final String baseURLOffShore = "https://offshoreleaks.icij.org/";
-    private final String baseURLWorlBank = "https://projects.worldbank.org/en/projects-operations/procurement/debarred-firms";
-    private final String baseURLOFAC = "https://sanctionssearch.ofac.treas.gov";
-
     /**
      *
      * @param entity
      */
     public void searchOffShore(final String entity) {
+        final String baseURLOffShore = "https://offshoreleaks.icij.org/";
+
         // 0. Setear los parámetros de búsqueda
         int from = 0;
         int resultsPerPage = 100;
@@ -103,6 +101,8 @@ public class WebScraper {
      * @param entity
      */
     public void searchWorldBank(final String entity) {
+        final String baseURLWorlBank = "https://projects.worldbank.org/en/projects-operations/procurement/debarred-firms";
+
         // 0. Configurar el web driver (en este caso, ChromeDriver) y los parámetros de búsqueda
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
