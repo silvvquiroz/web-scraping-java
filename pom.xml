@@ -20,31 +20,15 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.15.2</version>
+            <version>1.22.1</version>
         </dependency>
 
         <!-- Dependencia 02: Selenium (web scraping en contenido dinámico) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.1.0</version>
+            <version>4.40.0</version>
         </dependency>
-
-        <!-- Dependencia 03: WebDrivermanager (para tener un navegador controlado por Selenium) -->
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>4.4.3</version>
-        </dependency>
-
-        <!-- Dependencia 04: SLF4J (registro de logs usado por WebDriverManager) -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.32</version>
-        </dependency>
-
-
 
 </dependencies>
 

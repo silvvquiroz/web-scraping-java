@@ -1,4 +1,3 @@
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,11 +9,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
+import java.util.List;
 
 public class WebScraper {
 
     private String baseURLOffShore = "https://offshoreleaks.icij.org/";
     private String baseURLWorlBank = "https://projects.worldbank.org/en/projects-operations/procurement/debarred-firms";
+    private String baseURLOFAC = "https://sanctionssearch.ofac.treas.gov";
 
     /**
      *
@@ -103,11 +104,6 @@ public class WebScraper {
      */
     public void searchWorldBank(final String entity) {
         // 0. Configurar el web driver (en este caso, ChromeDriver) y los parámetros de búsqueda
-
-        // Establecer ChromeDriver como el driver por defecto de WebDriverManager
-        WebDriverManager.chromedriver().setup();
-
-        // Configurar ChromeDriver para trbajar con Selenium
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
 
@@ -128,18 +124,49 @@ public class WebScraper {
              */
             WebElement textBox = driver.findElement(By.id("category"));
 
+            // Esperar a que los elementos estén localizados y listos para actualizarse
+            Thread.sleep(2000);
+
             // 3. Ingresar el texto a buscar (nombre de la entidad)
             textBox.sendKeys(searchEntity);
 
-            // Esperar a que la tabla se actualice por completo
-            Thread.sleep(2000);
-
             // 4. Obtener el HTML actualizado y seleccionar las filas de la tabla
-            WebElement table = driver.findElement(By.id("k-debarred-firms"));
+            WebElement tableParent = driver.findElement(By.id("k-debarred-firms")).findElement(By.className("k-grid-content"));
+            List<WebElement> rows = tableParent.findElements(By.tagName("tr"));
 
-            // Testing: Imprimir el HTML actualizado
-            String html = table.getAttribute("outerHTML");
-            System.out.println(html);
+            // Testing: Número de filas encontradas
+            System.out.println("Results count: " + rows.size());
+
+            // 5. Iterar por cada fila de resultado para obtener los datos
+            for(WebElement row : rows) {
+
+                // Testing: Imprimir el HTML actualizado
+                //String html = row.getAttribute("outerHTML");
+                //System.out.println(html);
+
+                // Obtener el arreglo de datos
+                List<WebElement> data = row.findElements(By.tagName("td"));
+                String firmName = data.get(0).getText();
+                String address = data.get(2).getText();
+                String country = data.get(3).getText();
+                String fromDate = data.get(4).getText();
+                String toDate = data.get(5).getText();
+                String grounds = data.get(6).getText();
+                /*
+                El elemento en la posición 1 es ignorado, ya que no es mostrado
+                en la tabla de la página y tampoco forma parte de los atributos
+                solicitados
+                 */
+
+                // Testing: Imprimir los datos scrapeados
+                System.out.println("Firm Name: " + firmName);
+                System.out.println("Address: " + address);
+                System.out.println("Country: " + country);
+                System.out.println("From Date: " + fromDate);
+                System.out.println("To Date: " + toDate);
+                System.out.println("Grounds: " + grounds);
+
+            }
 
         }
         catch (RuntimeException | InterruptedException e) {
@@ -151,12 +178,21 @@ public class WebScraper {
         }
     }
 
+    /**
+     *
+     * @param entity
+     * @param score
+     */
+    public void searchOFACAPI(final String entity, final int score) {
+
+    }
+
     public static void main(String[] args) {
         System.out.println("Starting Test...");
 
         WebScraper ws = new WebScraper();
-        String entityTesting = "AERO CONTINENT";
-        //ws.searchOffShore(entityTesting);
+        String entityTesting = "aero";
+        ws.searchOffShore(entityTesting);
         ws.searchWorldBank(entityTesting);
 
         System.out.println("Test Finished!");
