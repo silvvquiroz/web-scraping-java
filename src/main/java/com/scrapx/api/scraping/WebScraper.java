@@ -1,5 +1,7 @@
 package com.scrapx.api.scraping;
 
+import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.WaitUntilState;
 import com.scrapx.api.dto.OFACResults;
 import com.scrapx.api.dto.OffShoreResult;
 import com.scrapx.api.dto.WorldBankResult;
@@ -13,6 +15,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.Sleeper;
 import org.springframework.stereotype.Component;
 
@@ -20,14 +23,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.URI;
-import java.net.URLEncoder;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -122,106 +123,6 @@ public class WebScraper {
 
         return results;
 
-    }
-
-    /**
-     *
-     * @param entity
-     */
-    public List<WorldBankResult> searchWorldBank(final String entity) {
-        List<WorldBankResult> results = new ArrayList<>();
-
-        // 0. Configurar el web driver (en este caso, ChromeDriver) y los parámetros de búsqueda
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-
-        // Flags para el contenedor
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--window-size=1920,1080");
-
-        //Usar Chromium, no Chrome (especificación necesaria para el contenedor)
-        options.setBinary("/usr/bin/chromium");
-
-        // Forzar el ChromeDriver del container
-        ChromeDriverService service = new ChromeDriverService.Builder()
-                .usingDriverExecutable(new File("/usr/bin/chromedriver"))
-                .build();
-
-        // Iniciar el WebDriver con ChromeDriver
-        WebDriver driver = new ChromeDriver(service, options);
-
-        String searchEntity = entity.trim();
-
-        try {
-            // 1. Conectar a la URL de WorldBank
-            driver.get(baseURLWorldBank);
-
-            // 2. Localizar el textbox de búsqueda
-            /*
-            Sidenote: El nombre de la entidad se ingresa en un elemento de forma:
-            tag: <input>
-            id: "category"
-             */
-            WebElement textBox = driver.findElement(By.id("category"));
-
-            // Esperar a que los elementos estén localizados y listos para actualizarse
-            Sleeper.SYSTEM_SLEEPER.sleep(Duration.ofSeconds(2));
-
-            // 3. Ingresar el texto a buscar (nombre de la entidad)
-            textBox.sendKeys(searchEntity);
-
-            // 4. Obtener el HTML actualizado y seleccionar las filas de la tabla
-            WebElement tableParent = driver.findElement(By.id("k-debarred-firms")).findElement(By.className("k-grid-content"));
-            List<WebElement> rows = tableParent.findElements(By.tagName("tr"));
-
-            // Testing: Número de filas encontradas
-            System.out.println("Results count: " + rows.size());
-
-            // 5. Iterar por cada fila de resultado para obtener los datos
-            for(WebElement row : rows) {
-
-                // Testing: Imprimir el HTML actualizado
-                //String html = row.getAttribute("outerHTML");
-                //System.out.println(html);
-
-                // Obtener el arreglo de datos
-                List<WebElement> data = row.findElements(By.tagName("td"));
-                String firmName = data.get(0).getText();
-                String address = data.get(2).getText();
-                String country = data.get(3).getText();
-                String fromDate = data.get(4).getText();
-                String toDate = data.get(5).getText();
-                String grounds = data.get(6).getText();
-                /*
-                El elemento en la posición 1 es ignorado, ya que no es mostrado
-                en la tabla de la página y tampoco forma parte de los atributos
-                solicitados
-                 */
-
-                // Testing: Imprimir los datos scrapeados
-//                System.out.println("Firm Name: " + firmName);
-//                System.out.println("Address: " + address);
-//                System.out.println("Country: " + country);
-//                System.out.println("From Date: " + fromDate);
-//                System.out.println("To Date: " + toDate);
-//                System.out.println("Grounds: " + grounds);
-
-                results.add(new WorldBankResult(firmName, address, country, fromDate, toDate, grounds));
-
-            }
-
-        }
-        catch (RuntimeException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        finally {
-            // x. Cerrar el driver de Chrome después de procesar
-            driver.quit();
-        }
-
-        return results;
     }
 
     /**
@@ -426,5 +327,6 @@ public class WebScraper {
     private String encode(String s) {
         return URLEncoder.encode(s == null ? "" : s, StandardCharsets.UTF_8);
     }
-
+    
 }
+
