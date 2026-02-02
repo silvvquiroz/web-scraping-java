@@ -11,10 +11,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Sleeper;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieManager;
@@ -25,6 +28,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -129,10 +133,24 @@ public class WebScraper {
 
         // 0. Configurar el web driver (en este caso, ChromeDriver) y los parámetros de búsqueda
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
+        options.addArguments("--headless=new");
+
+        // Flags para el contenedor
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+
+        //Usar Chromium, no Chrome (especificación necesaria para el contenedor)
+        options.setBinary("/usr/bin/chromium");
+
+        // Forzar el ChromeDriver del container
+        ChromeDriverService service = new ChromeDriverService.Builder()
+                .usingDriverExecutable(new File("/usr/bin/chromedriver"))
+                .build();
 
         // Iniciar el WebDriver con ChromeDriver
-        WebDriver driver = new ChromeDriver(options);
+        WebDriver driver = new ChromeDriver(service, options);
 
         String searchEntity = entity.trim();
 
@@ -149,7 +167,7 @@ public class WebScraper {
             WebElement textBox = driver.findElement(By.id("category"));
 
             // Esperar a que los elementos estén localizados y listos para actualizarse
-            Thread.sleep(2000);
+            Sleeper.SYSTEM_SLEEPER.sleep(Duration.ofSeconds(2));
 
             // 3. Ingresar el texto a buscar (nombre de la entidad)
             textBox.sendKeys(searchEntity);
