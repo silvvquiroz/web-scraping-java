@@ -13,20 +13,20 @@ public class ScrapingController {
         this.service = service;
     }
 
-//    @GetMapping("/scrap")
-//    public ScrapingResponse scrap(@RequestParam String entity, @RequestParam String score) {
-//        return service.scrap(entity, score);
-//    }
+    @GetMapping("/scrap")
+    public ScrapingResponse scrap(@RequestParam String entity, @RequestParam String score) {
+        return service.scrap(entity, score);
+    }
 
     @GetMapping("/offshore")
     public SourceResponse<OffShoreResult> offshore(@RequestParam String entity) {
         return service.scrapOffShore(entity);
     }
 
-//    @GetMapping("/worldbank")
-//    public SourceResponse<WorldBankResult> worldbank(@RequestParam String entity) {
-//        return service.scrapWorldBank(entity);
-//    }
+    @GetMapping("/worldbank")
+    public SourceResponse<WorldBankResult> worldbank(@RequestParam String entity) {
+        return service.scrapWorldBank(entity);
+    }
 
     @GetMapping("/ofac")
     public SourceResponse<OFACResults> ofac(@RequestParam String entity, @RequestParam String score) {
