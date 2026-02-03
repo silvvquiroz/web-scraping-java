@@ -35,7 +35,7 @@ public class ScrapingController {
     public ScrapingController(ScrapingService service) {
         this.service = service;
         // Configuración del Bucket: 20 solicitudes, recarga de 20 solicitudes cada minuto
-        Bandwidth limit = Bandwidth.classic(10, Refill.intervally(10, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.classic(20, Refill.intervally(20, Duration.ofMinutes(1)));
         this.bucket = Bucket.builder().addLimit(limit).build();
     }
 
