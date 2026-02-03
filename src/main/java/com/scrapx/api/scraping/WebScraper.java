@@ -1,7 +1,5 @@
 package com.scrapx.api.scraping;
 
-import com.microsoft.playwright.*;
-import com.microsoft.playwright.options.WaitUntilState;
 import com.scrapx.api.dto.OFACResults;
 import com.scrapx.api.dto.OffShoreResult;
 import com.scrapx.api.dto.WorldBankResult;
