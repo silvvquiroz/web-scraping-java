@@ -39,14 +39,6 @@
             <version>4.40.0</version>
         </dependency>
 
-        <!-- Dependencia 02: Playwright -->
-        <dependency>
-            <groupId>com.microsoft.playwright</groupId>
-            <artifactId>playwright</artifactId>
-            <version>1.58.0</version>
-        </dependency>
-
-
         <!-- Dependencia 03: SpringBoot (creación API REST) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -71,6 +63,20 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- Dependencia 04: Bucket4j (para controlar el rate-limit) -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>8.7.0</version>
+        </dependency>
+
+        <!-- Dependencia 05: JWT (autenticación) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.3</version>
         </dependency>
 
 

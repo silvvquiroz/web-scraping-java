@@ -144,12 +144,14 @@ public class WebScraper {
 
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        catch (IOException e) {
+            System.err.println("Error durante el scraping de OffShore: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
 
+        }
         return results;
-
     }
 
     /**
@@ -244,7 +246,9 @@ public class WebScraper {
 
         }
         catch (RuntimeException e) {
+            System.err.println("Error durante el scraping de OffShore: " + e.getMessage());
             e.printStackTrace();
+            return new ArrayList<>();
         }
         finally {
             // 7. Cerrar el driver de Chrome después de procesar
@@ -295,13 +299,17 @@ public class WebScraper {
 
             // 2. Hacer una petición GET inicial para obtener la sesión y hidden fields
             String initialHTML = getHtml(client, baseOFACURL);
-            /**
-             * TO-DO: agregar validación en caso sea null
-             */
+            if (initialHTML == null || initialHTML.isEmpty()) {
+                return new ArrayList<>();
+            }
+
             Document initialDoc = Jsoup.parse(initialHTML, baseOFACURL);
 
             // 3. Extraer todos los inputs del forms
             Map<String, String> form = extractAllInputs(initialDoc);
+            if (form.isEmpty()) {
+                return new ArrayList<>();
+            }
 
             // 4. Sobreescribir los inputs necesarios (nombre de la entidad, tipo, score y submit del botón)
             form.put(inputName, searchEntity);
@@ -347,7 +355,9 @@ public class WebScraper {
 
         }
         catch (Exception e) {
+            System.err.println("Error durante el scraping de OffShore: " + e.getMessage());
             e.printStackTrace();
+            return new ArrayList<>();
         }
 
         return results;
@@ -356,9 +366,9 @@ public class WebScraper {
     /**
      * Ejecuta una petición GET y retorna el HTML de la respuesta
      * 
-     * @param client
-     * @param url
-     * @return
+     * @param client Cliente HTTP configurado
+     * @param url URl destino
+     * @return HTML en texto plano (UTF-8) o null si ocurre un error
      */
     private String getHtml(HttpClient client, String url) {
         try {
@@ -383,9 +393,10 @@ public class WebScraper {
     }
 
     /**
-     * 
-     * @param resp
-     * @return
+     * Decodifica el body de una respuesta HTTP, soporta gzip si aplica
+     *
+     * @param resp Respuesta HTTP en bytes
+     * @return Texto decodificado en UTF-8 o null si falla la lectura
      */
     private  String decodeBody(HttpResponse<byte[]> resp) {
         try {
@@ -410,6 +421,12 @@ public class WebScraper {
         }
     }
 
+    /**
+     * Extrae todos los inputs del form principal
+     *
+     * @param htmlDoc Documento HTML parseado con Jsoup
+     * @return Mapa de inputs
+     */
     private Map<String, String> extractAllInputs (Document htmlDoc) {
         Map<String, String> inputsMap = new LinkedHashMap<>();
 
@@ -440,12 +457,22 @@ public class WebScraper {
         return inputsMap;
     }
 
+    /**
+     * Envía un POST usando el mapa de inputs como payload
+     *
+     * @param client Cliente HTTP configurado
+     * @param url Endpoint destino (action del form)
+     * @param form Campos del formulario
+     * @return HTML resultante o null si falla
+     */
     private String postForm(HttpClient client, String url, Map<String, String> form) {
         try {
+            // 1. Serializar el mapa como querystring form-urlencoded
             String body = form.entrySet().stream()
                     .map(e -> encode(e.getKey()) + "=" + encode(e.getValue()))
                     .collect(Collectors.joining("&"));
 
+            // 2. Construir el POST request
             HttpRequest req = HttpRequest.newBuilder(URI.create(url))
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .header("User-Agent", userAgent)
@@ -456,14 +483,10 @@ public class WebScraper {
                     .header("Referer", url)
                     .build();
 
+            // 3. Enviar el request
             HttpResponse<byte[]> resp = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
 
-            System.out.println("POST status: " + resp.statusCode());
-            System.out.println("POST uri: " + resp.uri());
-            System.out.println("POST Content-Encoding: " + resp.headers().firstValue("Content-Encoding").orElse("(none)"));
-            System.out.println("POST Content-Type: " + resp.headers().firstValue("Content-Type").orElse("(none)"));
-
-
+            // 4. Decodificar body
             return decodeBody(resp);
         }
         catch (IOException | InterruptedException e) {
@@ -472,13 +495,26 @@ public class WebScraper {
         }
     }
 
+    /**
+     * Encode helper
+     * @param s Texto a codificar
+     * @return Texto codificado
+     */
     private String encode(String s) {
         return URLEncoder.encode(s == null ? "" : s, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Método de prueba local
+     *
+     * @param args
+     */
     public static void main (String[] args) {
         WebScraper ws = new WebScraper();
+        ws.searchOffShore("aero");
         ws.searchWorldBank("aero");
+        ws.searchOFAC("aero", "100");
     }
+
 }
 
