@@ -1,22 +1,20 @@
-# 1) Build
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+# Usar Eclipse Temurin como base para Java 17
+FROM eclipse-temurin:17-jdk
+
+# Instalar Maven y Chromium en el contenedor
+RUN apt-get update && apt-get install -y maven chromium
+
+# Establecer el directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Mejor cache de dependencias
-COPY pom.xml .
-RUN mvn -q -DskipTests dependency:go-offline
-
-# Copia el resto y compila
+# Copiar el código del proyecto al contenedor
 COPY . .
-RUN mvn -q clean package -DskipTests
 
-# 2) Run
-FROM eclipse-temurin:21-jre-jammy
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+# Ejecutar Maven para instalar las dependencias y compilar el proyecto
+RUN mvn clean install
 
+# Exponer el puerto que se utilizará
 EXPOSE 8080
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 
-# 'exec' para que Java sea PID 1 (mejor señales / shutdown)
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
+# Ejecutar la aplicación
+CMD ["mvn", "spring-boot:run"]

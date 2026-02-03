@@ -39,25 +39,51 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Componente central de web scraping con funcionalidad implementada para
+ * 3 fuentes externas:
+ * 
+ * 1) OffShore Leaks -> scraping por HTML estático usando Jsoup
+ * 2) World Bank -> scraping dinámico usando Selenium
+ * 3) OFAC -> scraping por simulación de formulario ASP.NET
+ * 
+ * Sidenote: Este componente está pensado para integrarse a endpoints API,
+ * por lo que devuelve DTOs listos.
+ */
 @Component
 public class WebScraper {
 
+    /** URL base para la página OffShore */
     private final String baseURLOffShore = "https://offshoreleaks.icij.org/";
+    
+    /** URL base para la página WorldBank */
     private final String baseURLWorldBank = "https://projects.worldbank.org/en/projects-operations/procurement/debarred-firms";
+    
+    /** URL base para la página OFAC */
     private final String baseOFACURL = "https://sanctionssearch.ofac.treas.gov/Default.aspx";
+    
+    /** User-Agent para peticiones HTTP (usado en la página OFAC) */
     private final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
 
     /**
-     *
-     * @param entity
+     * Scrapea resultados de OffShore Leaks para una entidad dada.
+     * 
+     * Sidenote: La página renderiza resultados en una tabla con paginación
+     * indicada en el parámetro "from". Cada bloque suele retornar 100 filas.
+     * @param entity Nombre de la entidad a buscar
+     * @return Lista de resultados con atributos: entityName, jurisdiction, linkedTo, dataFrom
      */
     public List<OffShoreResult> searchOffShore(final String entity) {
+        System.out.println("======= Scraping: OffShore Leaks =======");
+
         List<OffShoreResult> results = new ArrayList<>();
 
         // 0. Setear los parámetros de búsqueda
         int from = 0;
         int resultsPerPage = 100;
         String trailParams = "&c=&j=&d=&cat=Entity";
+
+        // Normalizar el parámetro de entrada
         String searchEntity = entity.trim().replace(" ", "+");
 
         try {
@@ -70,7 +96,8 @@ public class WebScraper {
                 // 1. Construir la URL con parámetros de búsqueda
                 String searchURL = baseURLOffShore + "search?q=" + searchEntity + trailParams + "&from=" + from;
 
-                System.out.println(searchURL);
+                System.out.println("URL: " + searchURL);
+
                 // 2. Conectar a la URL y obtener el HTML de la página
                 Document doc = Jsoup.connect(searchURL).get();
 
@@ -81,10 +108,13 @@ public class WebScraper {
                 */
                 Elements tableBody = doc.getElementsByTag("tbody");
                 if (tableBody.isEmpty()) {
+                    // No hay más resultados
                     break;
                 }
 
                 Elements rows = tableBody.get(0).getElementsByTag("tr");
+
+                System.out.println("Results count: " + rows.size());
 
                 // 4. Iterar sobre las filas de la tabla y extraer los datos de la entidad
                 for (Element row: rows) {
@@ -106,15 +136,10 @@ public class WebScraper {
                     // Extraer la fuente de data (tag <td> y clase "source", tag <a> y atributo "title")
                     String dataFrom = row.select("td.source a").attr("title");
 
-//                    // Testing: Imprimir los datos scrapeados
-//                    System.out.println("Entity: " + entityName);
-//                    System.out.println("Jurisdiction: " + jurisdiction);
-//                    System.out.println("Linked To: " + linkedTo);
-//                    System.out.println("Data From: " + dataFrom);
-
                     results.add(new OffShoreResult(entityName, jurisdiction, linkedTo, dataFrom));
                 }
 
+                // 5. Siguiente bloque
                 from += resultsPerPage;
 
             }
@@ -127,25 +152,43 @@ public class WebScraper {
 
     }
 
+    /**
+     * Scrapea resultados de WorldBank para una entidad dada.
+     * 
+     * Sidenote: Esta página depende de JS (tabla tipo Kendo/Grid). Por ello
+     * se usa Selenium para (1) cargar la página, (2) escribir en el filtro,
+     * y (3) esperar a que cambie el número de filas.
+     * 
+     * @param entity Nombre de la entidad a buscar
+     * @return Lista de resultados con atributos: firmName, address, country, fromDate, toDate, grounds
+     */
     public List<WorldBankResult> searchWorldBank(final String entity) {
+        System.out.println("======= Scraping: WorldBanks =======");
+
         List<WorldBankResult> results = new ArrayList<>();
 
         // 0. Configurar el web driver (en este caso, ChromeDriver) y los parámetros de búsqueda
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
-        // Configura el binario de Chromium en Windows
-        //options.setBinary("C:\\Program Files (x86)\\Chromium\\Application\\chrome.exe");  // Asegúrate de que esta ruta sea correcta
 
-        // Iniciar el WebDriver con ChromeDriver
-        WebDriver driver = new ChromeDriver(options);
+        // Flags recomendadas para contenedores
+        options.addArguments("--no-sandbox"); 
+        options.addArguments("--disable-dev-shm-usage");
+        
+        // Ruta de chromium-browser en el contenedor desplegado
+        options.setBinary("/usr/bin/chromium-browser");
 
+        // Normalizar el parámetro de entrada
         String searchEntity = entity.trim();
 
+        // 1. Iniciar el WebDriver con ChromeDriver
+        WebDriver driver = new ChromeDriver(options);
+
         try {
-            // 1. Conectar a la URL de WorldBank
+            // 2. Conectar a la URL de WorldBank
             driver.get(baseURLWorldBank);
 
-            // 2. Localizar el textbox de búsqueda
+            // 3. Localizar el textbox de búsqueda
             /*
             Sidenote: El nombre de la entidad se ingresa en un elemento de forma:
             tag: <input>
@@ -153,28 +196,22 @@ public class WebScraper {
              */
             WebElement textBox = driver.findElement(By.id("category"));
 
-            // Esperar a que los elementos estén localizados y listos para actualizarse
-            //Thread.sleep(2000);
-
+            // Esperar a que la tabla esté renderizada y lista para actualizarse
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.className("k-grid-content")));  // Esperamos que la tabla esté presente
 
+            // Obtener el conteo inicial de filas (antes del filtrado)
             List<WebElement> initialRows = driver.findElements(By.cssSelector(".k-grid-content tr"));
             int initialRowCount = initialRows.size();
 
             // 3. Ingresar el texto a buscar (nombre de la entidad)
             textBox.sendKeys(searchEntity);
-            //Thread.sleep(2000);
 
-            // 3. Esperar a que el número de filas cambie progresivamente (más específico)
+            // Esperar a que el número de filas cambie progresivamente (más específico)
             WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait2.until(ExpectedConditions.not(
                     ExpectedConditions.numberOfElementsToBe(By.cssSelector(".k-grid-content tr"), initialRowCount)
             ));
-
-            // 4. Esperar hasta que el contenido de la tabla esté presente (usamos WebDriverWait)
-            //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            //wait.until(ExpectedConditions.presenceOfElementLocated(By.className("k-grid-content")));  // Esperamos que la tabla esté presente
 
             // 4. Obtener el HTML actualizado y seleccionar las filas de la tabla
             WebElement tableParent = driver.findElement(By.id("k-debarred-firms")).findElement(By.className("k-grid-content"));
@@ -186,31 +223,20 @@ public class WebScraper {
             // 5. Iterar por cada fila de resultado para obtener los datos
             for(WebElement row : rows) {
 
-                // Testing: Imprimir el HTML actualizado
-                //String html = row.getAttribute("outerHTML");
-                //System.out.println(html);
-
-                // Obtener el arreglo de datos
+                // 6. Obtener el arreglo de datos
                 List<WebElement> data = row.findElements(By.tagName("td"));
+
+                /*
+                Sidenote: El elemento en la posición 1 es ignorado, ya que no es mostrado
+                en la tabla de la página y tampoco forma parte de los atributos
+                solicitados
+                 */
                 String firmName = data.get(0).getText();
                 String address = data.get(2).getText();
                 String country = data.get(3).getText();
                 String fromDate = data.get(4).getText();
                 String toDate = data.get(5).getText();
                 String grounds = data.get(6).getText();
-                /*
-                El elemento en la posición 1 es ignorado, ya que no es mostrado
-                en la tabla de la página y tampoco forma parte de los atributos
-                solicitados
-                 */
-
-                // Testing: Imprimir los datos scrapeados
-//                System.out.println("Firm Name: " + firmName);
-//                System.out.println("Address: " + address);
-//                System.out.println("Country: " + country);
-//                System.out.println("From Date: " + fromDate);
-//                System.out.println("To Date: " + toDate);
-//                System.out.println("Grounds: " + grounds);
 
                 results.add(new WorldBankResult(firmName, address, country, fromDate, toDate, grounds));
 
@@ -221,7 +247,7 @@ public class WebScraper {
             e.printStackTrace();
         }
         finally {
-            // x. Cerrar el driver de Chrome después de procesar
+            // 7. Cerrar el driver de Chrome después de procesar
             driver.quit();
         }
 
@@ -229,11 +255,22 @@ public class WebScraper {
     }
 
     /**
-     *
-     * @param entity
-     * @param score
+     * Scrapea resultados de WorldBank para una entidad dada.
+     * 
+     * Sidenote: Esta página usa formularios de ASP.NET, por lo que se 
+     * usa un flujo con 2 peticiones HTTP:
+     * 1) GET inicial para obtener cookies de sesión + hidden fields (__VIEWSTATE, etc.)
+     * 2) Sobreescribir inputs relevantes (entity, type, score, submit)
+     * 3) POST con application/x-www-form-urlencoded
+     * 4) Parsear la tabla de resultados gvSearchResults
+     * 
+     * @param entity Nombre de la entidad a buscar
+     * @param score Nivel mínimo de coincidencia de nombre
+     * @return Lista de resultados con atributos: name, address, type, program, list, score
      */
     public List<OFACResults> searchOFAC(final String entity, final String score) {
+        System.out.println("======= Scraping: WorldBanks =======");
+
         List<OFACResults> results = new ArrayList<>();
 
         // 0. Setear los inputs y valores por defecto para las peticiones
@@ -245,6 +282,7 @@ public class WebScraper {
         final String valueType = "Entity";
         final String valueSearch = "Search";
 
+        // Normalizar el parámetro de entrada
         String searchEntity = entity.trim();
 
         try {
@@ -262,8 +300,10 @@ public class WebScraper {
              */
             Document initialDoc = Jsoup.parse(initialHTML, baseOFACURL);
 
-            // 4. Sobreescribir los inputs necesarios (nombre de la entidad, tipo, score y submit del botón)
+            // 3. Extraer todos los inputs del forms
             Map<String, String> form = extractAllInputs(initialDoc);
+
+            // 4. Sobreescribir los inputs necesarios (nombre de la entidad, tipo, score y submit del botón)
             form.put(inputName, searchEntity);
             form.put(inputType, valueType);
             form.put(inputScore, score);
@@ -285,11 +325,12 @@ public class WebScraper {
                 return new ArrayList<>();
             }
 
+            // 8. Iterar filas y mapear las columnas con el DTO
             Elements rows = table.select("tr");
-
             for (Element row : rows) {
-                // x. Obtener los datos de cada fila
                 Elements data = row.select("td");
+
+                // Validación mínima: se esperan al menos 6 columnas visibles
                 if (data.size() < 6) {
                     continue;
                 }
@@ -301,15 +342,7 @@ public class WebScraper {
                 String listResult = data.get(4).text();
                 String scoreResult = data.get(5).text();
 
-                // Testing: Imprimir los datos de los resultados obtenidos
-//                System.out.println(nameResult);
-//                System.out.println(addressResult);
-//                System.out.println(typeResult);
-//                System.out.println(programResult);
-//                System.out.println(listResult);
-//                System.out.println(scoreResult);
-
-                results.add(new OFACResults(nameResult, addressResult, typeResult, programResult, listResult, score));
+                results.add(new OFACResults(nameResult, addressResult, typeResult, programResult, listResult, scoreResult));
             }
 
         }
@@ -320,6 +353,13 @@ public class WebScraper {
         return results;
     }
 
+    /**
+     * Ejecuta una petición GET y retorna el HTML de la respuesta
+     * 
+     * @param client
+     * @param url
+     * @return
+     */
     private String getHtml(HttpClient client, String url) {
         try {
             // 1. Construir la petición HTTP
@@ -342,6 +382,11 @@ public class WebScraper {
         }
     }
 
+    /**
+     * 
+     * @param resp
+     * @return
+     */
     private  String decodeBody(HttpResponse<byte[]> resp) {
         try {
             // 1. Obtener el valor del encabezado Content-Encoding
@@ -373,7 +418,7 @@ public class WebScraper {
             String name = el.attr("name");
             String value = "";
 
-            // Testing?? remove reset
+            // Quitar parámetros innecesarios para el POST request
             if ("ctl00$MainContent$btnReset".equals(name) || name.contains("Image")) continue;
 
             // 2. Obtener el valor directamente si se trata de un elemento <input>
