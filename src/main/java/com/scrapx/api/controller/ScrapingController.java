@@ -85,6 +85,7 @@ public class ScrapingController {
     }
 
     /**
+     * (DESHABILITADO)
      * Endpoint que maneja la solicitud de scraping solo en World Bank.
      *
      * Realiza el scraping de la fuente World Bank, devolviendo los resultados

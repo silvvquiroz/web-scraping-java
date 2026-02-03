@@ -70,7 +70,7 @@ Este endpoint realiza scraping solo en la fuente OffShore Leaks y devuelve los r
 }
 ```
 
-### 3. **/api/worldbank**
+### 3. **/api/worldbank (actualmente deshabilitada)**
 
 **Método**: `GET`
 
