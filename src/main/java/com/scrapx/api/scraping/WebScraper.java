@@ -134,7 +134,7 @@ public class WebScraper {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         // Configura el binario de Chromium en Windows
-        options.setBinary("C:\\Program Files (x86)\\Chromium\\Application\\chrome.exe");  // Asegúrate de que esta ruta sea correcta
+        //options.setBinary("C:\\Program Files (x86)\\Chromium\\Application\\chrome.exe");  // Asegúrate de que esta ruta sea correcta
 
         // Iniciar el WebDriver con ChromeDriver
         WebDriver driver = new ChromeDriver(options);
@@ -154,14 +154,27 @@ public class WebScraper {
             WebElement textBox = driver.findElement(By.id("category"));
 
             // Esperar a que los elementos estén localizados y listos para actualizarse
-            Thread.sleep(2000);
+            //Thread.sleep(2000);
+
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.className("k-grid-content")));  // Esperamos que la tabla esté presente
+
+            List<WebElement> initialRows = driver.findElements(By.cssSelector(".k-grid-content tr"));
+            int initialRowCount = initialRows.size();
 
             // 3. Ingresar el texto a buscar (nombre de la entidad)
             textBox.sendKeys(searchEntity);
+            //Thread.sleep(2000);
+
+            // 3. Esperar a que el número de filas cambie progresivamente (más específico)
+            WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(10));
+            wait2.until(ExpectedConditions.not(
+                    ExpectedConditions.numberOfElementsToBe(By.cssSelector(".k-grid-content tr"), initialRowCount)
+            ));
 
             // 4. Esperar hasta que el contenido de la tabla esté presente (usamos WebDriverWait)
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.className("k-grid-content")));  // Esperamos que la tabla esté presente
+            //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            //wait.until(ExpectedConditions.presenceOfElementLocated(By.className("k-grid-content")));  // Esperamos que la tabla esté presente
 
             // 4. Obtener el HTML actualizado y seleccionar las filas de la tabla
             WebElement tableParent = driver.findElement(By.id("k-debarred-firms")).findElement(By.className("k-grid-content"));
@@ -204,7 +217,7 @@ public class WebScraper {
             }
 
         }
-        catch (RuntimeException | InterruptedException e) {
+        catch (RuntimeException e) {
             e.printStackTrace();
         }
         finally {
