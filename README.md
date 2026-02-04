@@ -226,6 +226,9 @@ Esta sección resume el uso de los endpoints principales en producción y en loc
   Ejemplo:
   `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/offshore?entity=AERO`
 
+  Nota:
+  La fuente OffShore puede presentar caídas temporales, lo que puede provocar respuestas con error 404 cuando la conexión no se establece correctamente.
+
 - OFAC (scraping de la lista OFAC): obtener registros que coincidan con el nombre de la entidad, filtrando por porcentaje mínimo de coincidencia.
   `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/ofac?entity={entityName}&score={score}`
 
@@ -270,3 +273,4 @@ Para ejecutar las pruebas desde Postman, usar la colección incluida en el repos
 - Link de la colección: `https://go.postman.co/collection/49810004-78bee5f1-dbec-4e5d-b30e-6f8dff3394f3?source=collection_link`
 
 Las requests de la colección corresponden a los endpoints de producción y a la variante local de WorldBank, e incluyen ejemplos con los parámetros `entity` y `score`.
+La informacion mas detallada sobre el uso de las APIs se encuentra en la colección de Postman.
