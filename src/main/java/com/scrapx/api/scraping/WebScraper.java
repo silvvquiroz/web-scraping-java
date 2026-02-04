@@ -176,7 +176,8 @@ public class WebScraper {
         options.addArguments("--disable-dev-shm-usage");
         
         // Ruta de chromium-browser en el contenedor desplegado
-        options.setBinary("/usr/bin/chromium-browser");
+        // Para correr de forma local, comentar esta línea
+        //options.setBinary("/usr/bin/chromium-browser");
 
         // Normalizar el parámetro de entrada
         String searchEntity = entity.trim();

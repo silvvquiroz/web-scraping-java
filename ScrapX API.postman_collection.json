@@ -122,8 +122,8 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "hhttps://localhost:8080/api/worldbank?entity=AERO",
-          "protocol": "hhttps",
+          "raw": "http://localhost:8080/api/worldbank?entity=aero",
+          "protocol": "http",
           "host": [
             "localhost"
           ],
@@ -135,13 +135,66 @@
           "query": [
             {
               "key": "entity",
-              "value": "AERO"
+              "value": "aero"
             }
           ]
         },
         "description": "Obtiene todos los registros de la página de World Bank (debarred firms) que coinciden con el nombre de la entidad brindado.\n\n_**Sidenote:**_ Debido a las limitaciones del entorno de despliegue en Azure, el backend no puede ejecutar Chromium en modo headless, por lo que el endpoint que realiza web scraping sobre World Bank se encuentra inhabilitado en producción.  \nNo obstante, esta funcionalidad sí puede ejecutarse de forma local, donde el entorno permite el uso de Chromium sin restricciones.  \nSi se requiere probar este endpoint, se recomienda levantar el proyecto en entorno local."
       },
-      "response": []
+      "response": [
+        {
+          "name": "WorldBank (local)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/worldbank?entity=aero",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "worldbank"
+              ],
+              "query": [
+                {
+                  "key": "entity",
+                  "value": "aero"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 16:23:34 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": 200,\n    \"message\": \"Los resultados se encontraron éxitosamente\",\n    \"numHits\": 6,\n    \"results\": [\n        {\n            \"firmName\": \"TAIHAN CNS(Reg. No. 168-86-01556)*658\",\n            \"address\": \"TAIHAN SMART TOWER, 317 SIMIN-DAERO, DONGAN-GU, ANYANG-SI, 14055, GYEONGGI-DO\",\n            \"country\": \"Korea, Republic of\",\n            \"fromDate\": \"02-Apr-2024\",\n            \"toDate\": \"01-Oct-2026\",\n            \"grounds\": \"Controlled Affiliate of a Sanctioned Entity\"\n        },\n        {\n            \"firmName\": \"TAIHAN ELECTRIC WIRE CO., LTD.(aka Taihan Cable & Solution Co., Ltd.)(Reg. No. 988400DCPX4WRVN1G369)*658\",\n            \"address\": \"TAIHAN SMART TOWER, 317 SIMIN-DAERO, DONGAN-GU, ANYANG-SI, 14055, GYEONGGI-DO\",\n            \"country\": \"Korea, Republic of\",\n            \"fromDate\": \"02-Apr-2024\",\n            \"toDate\": \"01-Oct-2026\",\n            \"grounds\": \"Collusive, Fraudulent, and Obstructive Practices\"\n        },\n        {\n            \"firmName\": \"AEROSPACE AVIATION\",\n            \"address\": \"P.O. BOX 1007-00100, THIKA\",\n            \"country\": \"Kenya\",\n            \"fromDate\": \"01-Mar-2023\",\n            \"toDate\": \"Ongoing\",\n            \"grounds\": \"Cross Debarment: AfDB\"\n        },\n        {\n            \"firmName\": \"JOONGANG CONTROL CO., LTD.*623 (Reg. No. 111-81-21018)\",\n            \"address\": \"54, JIKJI-DAERO 409BEON-GIL, HEUNGDEOK-GU, CHEONGJU-SI, CHUNGCHEONGBUK-DO\",\n            \"country\": \"Korea, Republic of\",\n            \"fromDate\": \"02-Dec-2022\",\n            \"toDate\": \"Ongoing\",\n            \"grounds\": \"Controlled Affiliate of a Sanctioned Entity.\"\n        },\n        {\n            \"firmName\": \"CONSTRUTORA COESA S.A. - SUCURSAL HAITI\",\n            \"address\": \"3 RUE JEAN GILLES, ROUTE DE L'AEROPORT, PORT-AU\\u00adPRINCE\",\n            \"country\": \"Haiti\",\n            \"fromDate\": \"18-Mar-2022\",\n            \"toDate\": \"15-Jul-2026\",\n            \"grounds\": \"Cross Debarment: IDB\"\n        },\n        {\n            \"firmName\": \"EXODE TRAVEL*510\",\n            \"address\": \"AVENUE DES MILITANTS, NO. 5 AEROPORT DE N’DOLO, KINSHASA\",\n            \"country\": \"Congo, Democratic Republic of\",\n            \"fromDate\": \"05-Nov-2019\",\n            \"toDate\": \"Ongoing\",\n            \"grounds\": \"Procurement Guidelines, 1.14 (a)(ii) and 1.16(a)(ii)\"\n        }\n    ]\n}"
+        }
+      ]
     },
     {
       "name": "OFAC",
