@@ -70,7 +70,7 @@ Este endpoint realiza scraping solo en la fuente OffShore Leaks y devuelve los r
 }
 ```
 
-### 3. **/api/worldbank (actualmente deshabilitada)**
+### 3. **/api/worldbank**
 
 **Método**: `GET`
 
@@ -136,3 +136,137 @@ Si un usuario excede el número máximo de solicitudes permitidas (20 por minuto
 }
 ```
 En este caso, el cliente deberá esperar un minuto antes de poder hacer más solicitudes.
+
+## Despliegue (Docker + Azure Container Apps)
+
+Esta API fue empaquetada en un contenedor Docker y desplegada en **Azure Container Apps**. A continuacion se incluyen el contenido del `Dockerfile` y los pasos base para construir la imagen y publicarla en ACA.
+
+### Dockerfile
+
+```dockerfile
+# Usar Eclipse Temurin como base para Java 17
+FROM eclipse-temurin:17-jdk
+
+# Instalar Maven y Chromium en el contenedor
+RUN apt-get update && apt-get install -y maven chromium
+
+# Establecer el directorio de trabajo en el contenedor
+WORKDIR /app
+
+# Copiar el codigo del proyecto al contenedor
+COPY . .
+
+# Ejecutar Maven para instalar las dependencias y compilar el proyecto
+RUN mvn clean install
+
+# Exponer el puerto que se utilizara
+EXPOSE 8080
+
+# Ejecutar la aplicacion
+CMD ["mvn", "spring-boot:run"]
+```
+
+### Build y ejecucion local
+
+```bash
+docker build -t scrapx-api:latest .
+docker run --rm -p 8080:8080 scrapx-api:latest
+```
+
+### Uso directo de la imagen en Docker Hub
+
+Si se desea utilizar la imagen ya publicada en Docker Hub, se puede descargar y ejecutar directamente:
+
+```bash
+docker pull silvvquiroz/scrapx:v1
+docker run --rm -p 8080:8080 silvvquiroz/scrapx:v1
+```
+
+Repositorio en Docker Hub: `https://hub.docker.com/repository/docker/silvvquiroz/scrapx/general`
+
+Arquitectura soportada: `linux/amd64`.
+
+### Despliegue en Azure Container Apps (referencia)
+
+1. Publicar la imagen en Docker Hub:
+
+```bash
+docker tag scrapx-api:latest <USERNAME>/scrapx:latest
+docker push <USERNAME>/scrapx:latest
+```
+
+2. Crear el Container App y apuntar a la imagen:
+
+```bash
+az containerapp create \
+  -g <RESOURCE_GROUP> \
+  -n <APP_NAME> \
+  --image <USERNAME>/scrapx:latest \
+  --target-port 8080 \
+  --ingress external
+```
+
+Notas:
+- Reemplazar los valores entre `<>` por los del entorno.
+- Ver repositorio en Docker Hub: `https://hub.docker.com/repository/docker/silvvquiroz/scrapx/general`
+- Considerar que la version de produccion es la `v1` (no `v2`).
+
+## Uso de la API
+
+Esta sección resume el uso de los endpoints principales en producción y en local. Los parámetros ya descritos en la sección de Endpoints se incluyen aquí para mayor claridad.
+
+### Endpoints en producción (Azure Container Apps)
+
+- Offshore (scraping de OffShore Leaks): obtener registros que coincidan con el nombre de la entidad.
+  `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/offshore?entity={entityName}`
+
+  Parámetros:
+  - `entity` (string): nombre de la entidad a buscar.
+
+  Ejemplo:
+  `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/offshore?entity=AERO`
+
+- OFAC (scraping de la lista OFAC): obtener registros que coincidan con el nombre de la entidad, filtrando por porcentaje mínimo de coincidencia.
+  `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/ofac?entity={entityName}&score={score}`
+
+  Parámetros:
+  - `entity` (string): nombre de la entidad a buscar.
+  - `score` (string): porcentaje mínimo de coincidencia del nombre buscado.
+
+  Ejemplo:
+  `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/ofac?entity=AERO&score=100`
+
+- WorldBank (deshabilitada en producción): obtener registros de World Bank (debarred firms) que coincidan con el nombre de la entidad.
+  `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/worldbank?entity={entityName}`
+
+  Parámetros:
+  - `entity` (string): nombre de la entidad a buscar.
+
+  Ejemplo:
+  `https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/worldbank?entity=AERO`
+
+### Endpoint WorldBank en local
+
+Debido a limitaciones del despliegue, no es posible ejecutar Chromium dentro del contenedor Docker; por ello, el endpoint de WorldBank se recomienda probarlo de forma local.
+
+`http://localhost:8080/api/worldbank?entity=AERO`
+
+Parámetros:
+- `entity` (string): nombre de la entidad a buscar.
+
+Ejemplo:
+`http://localhost:8080/api/worldbank?entity=AERO`
+
+### Parámetros principales
+
+- `entity` (string): nombre de la entidad a buscar (requerido en Offshore, WorldBank y OFAC).
+- `score` (string): porcentaje mínimo de coincidencia del nombre buscado (requerido solo para OFAC).
+
+### Colección de Postman
+
+Para ejecutar las pruebas desde Postman, usar la colección incluida en el repositorio:
+
+- Archivo local: `ScrapX API.postman_collection.json`
+- Link de la colección: `https://go.postman.co/collection/49810004-78bee5f1-dbec-4e5d-b30e-6f8dff3394f3?source=collection_link`
+
+Las requests de la colección corresponden a los endpoints de producción y a la variante local de WorldBank, e incluyen ejemplos con los parámetros `entity` y `score`.
