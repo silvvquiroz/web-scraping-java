@@ -270,7 +270,7 @@ Ejemplo:
 Para ejecutar las pruebas desde Postman, usar la colección incluida en el repositorio:
 Para ejecutar las pruebas desde Postman, usar la colección incluida en el repositorio:
 
-- Archivo local: [ScrapX API.postman_collection.json](ScrapX API.postman_collection.json)
+- Archivo local: [ScrapX API.postman_collection.json](ScrapX%20API.postman_collection.json)
 - Link de la colección: https://go.postman.co/collection/49810004-78bee5f1-dbec-4e5d-b30e-6f8dff3394f3?source=collection_link
 
 Las requests de la colección corresponden a los endpoints de producción y a la variante local de WorldBank, e incluyen ejemplos con los parámetros `entity` y `score`.
