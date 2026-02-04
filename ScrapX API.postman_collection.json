@@ -1,0 +1,233 @@
+{
+  "info": {
+    "_postman_id": "78bee5f1-dbec-4e5d-b30e-6f8dff3394f3",
+    "name": "ScrapX API",
+    "description": "Colección de pruebas para la API REST de ScrapX.\n\nEsta API tiene un rate-limit de 20 solicitudes por minuto.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49810004",
+    "_collection_link": "https://go.postman.co/collection/49810004-78bee5f1-dbec-4e5d-b30e-6f8dff3394f3?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "OffShore",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/offshore?entity=AERO",
+          "protocol": "https",
+          "host": [
+            "scrapx-app",
+            "thankfulocean-d0a214e1",
+            "eastus",
+            "azurecontainerapps",
+            "io"
+          ],
+          "path": [
+            "api",
+            "offshore"
+          ],
+          "query": [
+            {
+              "key": "entity",
+              "value": "AERO"
+            }
+          ]
+        },
+        "description": "Obtiene todos los registros de la página OffShore Leaks que coinciden con el nombre de la entidad brindado.\n\n_**Sidenote:**_ La página OffShore, ocasionalmente, experimenta caídas temporales que pueden provocar que no se establezca la conexión correctamente. En estos casos, es posible que se reciba un error 404 debido a que la página no está disponible en ese momento."
+      },
+      "response": [
+        {
+          "name": "OffShore - No Connection",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/offshore?entity=AERO",
+              "protocol": "https",
+              "host": [
+                "scrapx-app",
+                "thankfulocean-d0a214e1",
+                "eastus",
+                "azurecontainerapps",
+                "io"
+              ],
+              "path": [
+                "api",
+                "offshore"
+              ],
+              "query": [
+                {
+                  "key": "entity",
+                  "value": "AERO"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "date",
+              "value": "Wed, 04 Feb 2026 13:30:59 GMT"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": 404,\n    \"message\": \"No se pudo establecer la conexión\",\n    \"numHits\": 0,\n    \"results\": []\n}"
+        }
+      ]
+    },
+    {
+      "name": "WorldBank (deshabilitada)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "hhttps://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/worldbank?entity=AERO",
+          "protocol": "hhttps",
+          "host": [
+            "scrapx-app",
+            "thankfulocean-d0a214e1",
+            "eastus",
+            "azurecontainerapps",
+            "io"
+          ],
+          "path": [
+            "api",
+            "worldbank"
+          ],
+          "query": [
+            {
+              "key": "entity",
+              "value": "AERO"
+            }
+          ]
+        },
+        "description": "Obtiene todos los registros de la página de World Bank (debarred firms) que coinciden con el nombre de la entidad brindado.\n\n_**Sidenote:**_ Debido a las limitaciones del entorno de despliegue en Azure, el backend no puede ejecutar Chromium en modo headless, por lo que el endpoint que realiza web scraping sobre World Bank se encuentra inhabilitado en producción.  \nNo obstante, esta funcionalidad sí puede ejecutarse de forma local, donde el entorno permite el uso de Chromium sin restricciones.  \nSi se requiere probar este endpoint, se recomienda levantar el proyecto en entorno local."
+      },
+      "response": []
+    },
+    {
+      "name": "WorldBank (local)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "hhttps://localhost:8080/api/worldbank?entity=AERO",
+          "protocol": "hhttps",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "worldbank"
+          ],
+          "query": [
+            {
+              "key": "entity",
+              "value": "AERO"
+            }
+          ]
+        },
+        "description": "Obtiene todos los registros de la página de World Bank (debarred firms) que coinciden con el nombre de la entidad brindado.\n\n_**Sidenote:**_ Debido a las limitaciones del entorno de despliegue en Azure, el backend no puede ejecutar Chromium en modo headless, por lo que el endpoint que realiza web scraping sobre World Bank se encuentra inhabilitado en producción.  \nNo obstante, esta funcionalidad sí puede ejecutarse de forma local, donde el entorno permite el uso de Chromium sin restricciones.  \nSi se requiere probar este endpoint, se recomienda levantar el proyecto en entorno local."
+      },
+      "response": []
+    },
+    {
+      "name": "OFAC",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/ofac?entity=AERO&score=100",
+          "protocol": "https",
+          "host": [
+            "scrapx-app",
+            "thankfulocean-d0a214e1",
+            "eastus",
+            "azurecontainerapps",
+            "io"
+          ],
+          "path": [
+            "api",
+            "ofac"
+          ],
+          "query": [
+            {
+              "key": "entity",
+              "value": "AERO"
+            },
+            {
+              "key": "score",
+              "value": "100"
+            }
+          ]
+        },
+        "description": "Obtiene todos los registros de la página de OFAC que coinciden con el nombre de la entidad brindado."
+      },
+      "response": [
+        {
+          "name": "OFAC - Success",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://scrapx-app.thankfulocean-d0a214e1.eastus.azurecontainerapps.io/api/ofac?entity=AERO&score=100",
+              "protocol": "https",
+              "host": [
+                "scrapx-app",
+                "thankfulocean-d0a214e1",
+                "eastus",
+                "azurecontainerapps",
+                "io"
+              ],
+              "path": [
+                "api",
+                "ofac"
+              ],
+              "query": [
+                {
+                  "key": "entity",
+                  "value": "AERO"
+                },
+                {
+                  "key": "score",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "key": "date",
+              "value": "Wed, 04 Feb 2026 13:23:26 GMT"
+            },
+            {
+              "key": "transfer-encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": 200,\n    \"message\": \"Los resultados se encontraron éxitosamente\",\n    \"numHits\": 33,\n    \"results\": [\n        {\n            \"name\": \"AERO CONTINENT S.A.\",\n            \"address\": \"Jr. Francisco Bolognesi 125, Piso 16, Miraflores\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO CONTINENTE (USA) INC.\",\n            \"address\": \"\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO CONTINENTE E.I.R.L.\",\n            \"address\": \"Avenida Jose Pardo 601; Int. 16\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO CONTINENTE S.A\",\n            \"address\": \"Jr. Francisco Bolognesi 125, Piso 16, Miraflores\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO CONTINENTE, INC.\",\n            \"address\": \"\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO COURIER CARGO S.A.\",\n            \"address\": \"Avenida Jose Pardo 601; Edificio La Alameda\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO ENGINE CORP OF CHINA\",\n            \"address\": \"5 Landianchang South Road Haidian District\",\n            \"type\": \"Entity\",\n            \"program\": \"CMIC-EO13959\",\n            \"list\": \"Non-SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO ENGINE CORPORATION OF CHINA\",\n            \"address\": \"5 Landianchang South Road Haidian District\",\n            \"type\": \"Entity\",\n            \"program\": \"CMIC-EO13959\",\n            \"list\": \"Non-SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO EXPRESS INTERCONTINENTAL S.A. DE C.V.\",\n            \"address\": \"Oriente 158 No. 390-E; Colonia Moctezuma, Segunda Seccion; Delegacion Venustiano Carranza\",\n            \"type\": \"Entity\",\n            \"program\": \"SDNTK\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO SKY ONE LTD\",\n            \"address\": \"Tianhe Qu, Tianhe Bei Lu, 255 Hao, 1606 Fang\",\n            \"type\": \"Entity\",\n            \"program\": \"SDGT\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO SKYONE CO. LIMITED\",\n            \"address\": \"Tianhe Qu, Tianhe Bei Lu, 255 Hao, 1606 Fang\",\n            \"type\": \"Entity\",\n            \"program\": \"SDGT\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"AERO-CARIBBEAN\",\n            \"address\": \"\",\n            \"type\": \"Entity\",\n            \"program\": \"CUBA\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"CHONGQING ZONGSHEN AERO ENGINE MANUFACTURING CO LTD\",\n            \"address\": \"Building 14, No. 126; Yunan Avenue, Banan District\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"CHONGQING ZONGSHEN AERO ENGINES MANUFACTURING CO LTD\",\n            \"address\": \"Building 14, No. 126; Yunan Avenue, Banan District\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"CHONGQING ZONSEN AERO ENGINE MANUFACTURING CO LTD\",\n            \"address\": \"Building 14, No. 126; Yunan Avenue, Banan District\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"DELTA-AERO TECHNICAL SERVICE CENTER LLC\",\n            \"address\": \"Vn. Ter. Settlement Moskovsky; Kievskoe Highway 22 km; household 4, building 1, floor 6, room/office 620 A/37\",\n            \"type\": \"Entity\",\n            \"program\": \"IFSR; NPWMD\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"DESIGN AND MANUFACTURING OF AERO-ENGINE COMPANY\",\n            \"address\": \"Shishesh Mina Street, Karaj Special Road\",\n            \"type\": \"Entity\",\n            \"program\": \"IFSR; NPWMD\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"GAZPROMNEFT AERO AO\",\n            \"address\": \"Zoologicheskii Per Dom 2-4, Lit. B\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024; UKRAINE-EO13662\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"GAZPROMNEFT AERO JOINT STOCK COMPANY\",\n            \"address\": \"Zoologicheskii Per Dom 2-4, Lit. B\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024; UKRAINE-EO13662\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"GORIZONT AERO\",\n            \"address\": \"Ul. Malaya Proletarskaya, D. 41; KV. 23\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY AERO-HIT\",\n            \"address\": \"Sh. Mateveevskoe, D. 28A; Pomeshch. 26\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY ASTRON AERO\",\n            \"address\": \"Ul. Parkovaya D. 1; Office 14\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY HORIZON AERO\",\n            \"address\": \"Ul. Malaya Proletarskaya, D. 41; KV. 23\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY MOLOT AERO\",\n            \"address\": \"Ul. Svobody, D. 106; KV. 1, Pomeshch 6\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY START AERO\",\n            \"address\": \"d. 3A str. 6 etazh 1 pom; 2, ul. 1-Ya Frunzenskaya\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY TECHNICAL SERVICE CENTER DELTA-AERO\",\n            \"address\": \"Vn. Ter. Settlement Moskovsky; Kievskoe Highway 22 km; household 4, building 1, floor 6, room/office 620 A/37\",\n            \"type\": \"Entity\",\n            \"program\": \"IFSR; NPWMD\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LIMITED LIABILITY COMPANY ZALA AERO\",\n            \"address\": \"9 Salyama Adilya St.; Office 3\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LLC AERO-HIT\",\n            \"address\": \"Sh. Mateveevskoe, D. 28A; Pomeshch. 26\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"LLC TSTO DELTA-AERO\",\n            \"address\": \"Vn. Ter. Settlement Moskovsky; Kievskoe Highway 22 km; household 4, building 1, floor 6, room/office 620 A/37\",\n            \"type\": \"Entity\",\n            \"program\": \"IFSR; NPWMD\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"OPEN JOINT STOCK COMPANY AERO ENGINE SCIENTIFIC AND TECHNICAL COMPANY SOYUZ\",\n            \"address\": \"2/4, Luzhnetskaya Naberezhnaya\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"REYNOLDS AERO\",\n            \"address\": \"9 str. 21; Ul. Godovikova\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"WRIGHT AERO COMPONENTS FZE\",\n            \"address\": \"Office No. 304, Third Floor, One UAQ Building\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        },\n        {\n            \"name\": \"ZALA AERO GROUP\",\n            \"address\": \"9 Salyama Adilya St.; Office 3\",\n            \"type\": \"Entity\",\n            \"program\": \"RUSSIA-EO14024\",\n            \"list\": \"SDN\",\n            \"score\": \"100\"\n        }\n    ]\n}"
+        }
+      ]
+    }
+  ]
+}
